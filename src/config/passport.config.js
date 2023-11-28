@@ -6,6 +6,9 @@ const HashManager = require('../util/hash');
 require('dotenv').config();
 const passportJWT = require('passport-jwt');
 const { generateToken } = require('../util/jwt');
+const CartManagerDb = require('../dao/managersDb/CartManagerDb');
+
+const CartController = new CartManagerDb();
 
 const JWTStrategy = passportJWT.Strategy;
 
@@ -39,12 +42,14 @@ const initializePassport = () => {
             console.log('user already existst');
             return done(null, false);
           }
+          const cartId = await CartController.createNewCart(req.body);
           const newUser = {
             first_name,
             last_name,
             email,
             age,
             password: HashController.createHash(password),
+            cartId: cartId._id,
           };
           const result = await userModel.create(newUser);
           return done(null, result);
@@ -99,15 +104,16 @@ const initializePassport = () => {
             user.token = token;
             return done(null, user);
           }
+          const cartId = await CartController.createNewCart([]);
           const newUser = {
             first_name: profile._json.name,
             last_name: '',
             email: profile._json.email,
             age: profile._json.age,
             password: HashController.createHash(''),
+            cartId: cartId._id,
           };
           const result = await userModel.create(newUser);
-          console.log(result);
 
           return done(null, result);
         } catch (error) {

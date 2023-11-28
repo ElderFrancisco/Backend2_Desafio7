@@ -1,25 +1,22 @@
 const { Router } = require('express');
 const passport = require('passport');
+const { accessPublicWithoutAuth, authToHome } = require('../../util/jwt');
 
 module.exports = (app) => {
   let router = new Router();
 
   app.use('/', router);
 
-  router.get('/', async (req, res) => {
+  router.get('/', authToHome, async (req, res) => {
     try {
-      if (req.cookies['cookieJWT']) {
-        const { user } = req.user;
-        return res.render('index', { user: user });
-      }
-
-      return res.render('index', {});
+      const user = req.user;
+      return res.render('index', { user: user });
     } catch (error) {
       console.log(error);
     }
   });
 
-  router.get('/register', async (req, res) => {
+  router.get('/register', accessPublicWithoutAuth, async (req, res) => {
     try {
       if (req.session?.user) {
         return res.redirect('/products');
@@ -30,23 +27,16 @@ module.exports = (app) => {
     }
   });
 
-  router.get(
-    '/login',
-    // passport.authenticate('jwt', {
-    //   session: false,
-    //   successRedirect: '/products',
-    // }),
-    async (req, res) => {
-      try {
-        if (req.cookies['cookieJWT']) {
-          return res.redirect('/products');
-        }
-        return res.render('login', {});
-      } catch (error) {
-        console.log(error);
+  router.get('/login', accessPublicWithoutAuth, async (req, res) => {
+    try {
+      if (req.cookies['cookieJWT']) {
+        return res.redirect('/products');
       }
-    },
-  );
+      return res.render('login', {});
+    } catch (error) {
+      console.log(error);
+    }
+  });
 
   router.get('/authfailed', async (req, res) => {
     try {

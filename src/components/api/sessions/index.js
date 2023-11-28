@@ -37,17 +37,37 @@ module.exports = (app) => {
         return res.cookie('cookieJWT', req.user.token).redirect('/products');
       },
     ),
-    router.get('/logout', async (req, res) => {
-      try {
-        if (req.cookies['cookieJWT']) {
-          // Elimina la cookie
-          res.clearCookie('cookieJWT').status(200).redirect('/');
-        } else {
-          res.status(400).redirect('/login');
+    router.get(
+      '/logout',
+      passport.authenticate('jwt', {
+        session: false,
+        failureRedirect: '/login',
+      }),
+      async (req, res) => {
+        try {
+          if (req.cookies['cookieJWT']) {
+            // Elimina la cookie
+            res.clearCookie('cookieJWT').status(200).redirect('/');
+          } else {
+            res.status(400).redirect('/login');
+          }
+        } catch (error) {
+          console.log(error);
+          return error;
         }
+      },
+    );
+
+  router.get(
+    '/current',
+    passport.authenticate('jwt', { session: false, failureRedirect: '/login' }),
+    async (req, res) => {
+      try {
+        return res.send({ status: 'Success', payload: req.user });
       } catch (error) {
         console.log(error);
         return error;
       }
-    });
+    },
+  );
 };

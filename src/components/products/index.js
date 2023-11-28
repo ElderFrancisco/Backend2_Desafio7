@@ -18,7 +18,6 @@ module.exports = (app) => {
     async (req, res) => {
       try {
         const { user } = req.user;
-        console.log(user);
         const currentPath = req.originalUrl;
         const params = req.query;
         const productsList = await productController.getProducts(
