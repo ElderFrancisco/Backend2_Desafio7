@@ -1,6 +1,7 @@
 const ProductManagerDb = require('../../../dao/managersDb/ProductManagerDb');
 const { Router } = require('express');
 const bodyParser = require('body-parser');
+const passport = require('passport');
 
 const productController = new ProductManagerDb();
 
@@ -11,20 +12,24 @@ module.exports = (app) => {
 
   app.use('/api/products', router);
 
-  router.get('/', async (req, res) => {
-    try {
-      const currentPath = req.originalUrl;
-      const params = req.query;
-      const productsList = await productController.getProducts(
-        params,
-        currentPath,
-      );
-      res.status(200).send(productsList);
-    } catch (error) {
-      console.log(error);
-      res.status(500).send(error);
-    }
-  });
+  router.get(
+    '/',
+    passport.authenticate('jwt', { session: false }),
+    async (req, res) => {
+      try {
+        const currentPath = req.originalUrl;
+        const params = req.query;
+        const productsList = await productController.getProducts(
+          params,
+          currentPath,
+        );
+        res.status(200).send(productsList);
+      } catch (error) {
+        console.log(error);
+        res.status(500).send(error);
+      }
+    },
+  );
 
   router.post('/', async (req, res) => {
     try {

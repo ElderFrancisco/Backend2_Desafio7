@@ -1,15 +1,13 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const private_key = process.env.PRIVATEKEY;
-
 const generateToken = (user) => {
   const token = jwt.sign({ user }, 'secret', { expiresIn: '24h' });
   return token;
 };
 
 const authToken = (req, res, next) => {
-  const token = req.cookies['CookieJWT'];
+  const token = req.cookies['cookieJWT'];
   console.log({ token });
   if (!token) return res.status(401).send({ error: 'noAuth' });
 

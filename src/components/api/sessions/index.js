@@ -1,6 +1,5 @@
 const { Router } = require('express');
 const passport = require('passport');
-const { generateToken } = require('../../../util/jwt');
 
 module.exports = (app) => {
   let router = new Router();
@@ -15,14 +14,7 @@ module.exports = (app) => {
         return res
           .status(400)
           .send({ status: error, error: 'credenciales invalidas' });
-      } /*
-      req.session.user = {
-        first_name: req.user.first_name,
-        last_name: req.user.last_name,
-        email: req.user.email,
-        age: req.user.age,
-        rol: req.user.rol,
-      };*/
+      }
       return res.cookie('cookieJWT', req.user.token).redirect('/products');
     },
   ),
@@ -47,15 +39,15 @@ module.exports = (app) => {
     ),
     router.get('/logout', async (req, res) => {
       try {
-        if (req.session?.user) {
-          req.session.destroy((err) => {
-            if (err) return res.status(500).send('logout error');
-          });
-          return res.redirect('/login');
+        if (req.cookies['cookieJWT']) {
+          // Elimina la cookie
+          res.clearCookie('cookieJWT').status(200).redirect('/');
+        } else {
+          res.status(400).redirect('/login');
         }
-        return res.redirect('/authfailed');
       } catch (error) {
         console.log(error);
+        return error;
       }
     });
 };

@@ -4,18 +4,15 @@ const github = require('passport-github2');
 const userModel = require('../dao/models/users.model');
 const HashManager = require('../util/hash');
 require('dotenv').config();
-const jwt = require('passport-jwt');
+const passportJWT = require('passport-jwt');
 const { generateToken } = require('../util/jwt');
 
-const JWTStrategy = jwt.Strategy;
-const ExtractJWT = jwt.ExtractJwt;
+const JWTStrategy = passportJWT.Strategy;
 
 const HashController = new HashManager();
 
-const cookieExtractor = (req) => {
-  const token = req && req.cookies ? req.cookies['CookieJWT'] : null;
-  console.log('COOKIE EXTRACOR', token);
-  return token;
+const extractCookie = (req) => {
+  return req.cookies ? req.cookies['cookieJWT'] : null;
 };
 
 /* 
@@ -100,7 +97,6 @@ const initializePassport = () => {
           if (user) {
             const token = generateToken(user);
             user.token = token;
-            console.log(user);
             return done(null, user);
           }
           const newUser = {
@@ -125,7 +121,7 @@ const initializePassport = () => {
     'jwt',
     new JWTStrategy(
       {
-        jwtFromRequest: ExtractJWT.fromExtractors([cookieExtractor]),
+        jwtFromRequest: passportJWT.ExtractJwt.fromExtractors([extractCookie]),
         secretOrKey: 'secret',
       },
       async (jwt_payload, done) => {

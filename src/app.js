@@ -10,6 +10,7 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const passport = require('passport');
 const initializePassport = require('./config/passport.config');
+const cookieParser = require('cookie-parser');
 
 class Server {
   constructor() {
@@ -47,6 +48,7 @@ class Server {
     this.app.use(passport.initialize());
     this.app.use(passport.session());
     utilSocket(this.server);
+    this.app.use(cookieParser());
   }
 
   connect() {

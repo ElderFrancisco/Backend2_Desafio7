@@ -8,8 +8,12 @@ module.exports = (app) => {
 
   router.get('/', async (req, res) => {
     try {
-      const user = req.session.user;
-      return res.render('index', { user });
+      if (req.cookies['cookieJWT']) {
+        const { user } = req.user;
+        return res.render('index', { user: user });
+      }
+
+      return res.render('index', {});
     } catch (error) {
       console.log(error);
     }
@@ -26,16 +30,23 @@ module.exports = (app) => {
     }
   });
 
-  router.get('/login', async (req, res) => {
-    try {
-      if (req.session?.user) {
-        return res.redirect('/products');
+  router.get(
+    '/login',
+    // passport.authenticate('jwt', {
+    //   session: false,
+    //   successRedirect: '/products',
+    // }),
+    async (req, res) => {
+      try {
+        if (req.cookies['cookieJWT']) {
+          return res.redirect('/products');
+        }
+        return res.render('login', {});
+      } catch (error) {
+        console.log(error);
       }
-      return res.render('login', {});
-    } catch (error) {
-      console.log(error);
-    }
-  });
+    },
+  );
 
   router.get('/authfailed', async (req, res) => {
     try {
