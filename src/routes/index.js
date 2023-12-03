@@ -1,12 +1,19 @@
-const webSocket = require('../components/webSocket');
-const api = require('../components/api');
-const products = require('../components/products');
-const carts = require('../components/carts');
-const loginRegister = require('../components/loginRegister');
+const webSocketRoute = require('./websocket.route');
+const productsRoute = require('./products.route');
+const cartsRoute = require('./cart.route');
+const sessionRoute = require('./session.route');
+
+const cartsApi = require('./api/carts.api');
+const productsApi = require('./api/products.api');
+const sessionsApi = require('./api/sessions.api');
+
 module.exports = (app) => {
-  webSocket(app);
-  api(app);
-  products(app);
-  carts(app);
-  loginRegister(app);
+  webSocketRoute(app);
+  productsRoute(app);
+  cartsRoute(app);
+  sessionRoute(app);
+  //api
+  cartsApi(app);
+  productsApi(app);
+  sessionsApi(app);
 };

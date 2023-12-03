@@ -1,4 +1,4 @@
-const CartManagerDb = require('../../dao/managersDb/CartManagerDb');
+const CartManagerDb = require('../dao/managersDb/CartManagerDb');
 const { Router } = require('express');
 const bodyParser = require('body-parser');
 

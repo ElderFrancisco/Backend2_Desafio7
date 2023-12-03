@@ -3,11 +3,11 @@ const local = require('passport-local');
 const github = require('passport-github2');
 const userModel = require('../dao/models/users.model');
 const HashManager = require('../util/hash');
-require('dotenv').config();
+
 const passportJWT = require('passport-jwt');
 const { generateToken } = require('../util/jwt');
 const CartManagerDb = require('../dao/managersDb/CartManagerDb');
-
+const { config, mongo } = require('./config');
 const CartController = new CartManagerDb();
 
 const JWTStrategy = passportJWT.Strategy;
@@ -17,12 +17,6 @@ const HashController = new HashManager();
 const extractCookie = (req) => {
   return req.cookies ? req.cookies['cookieJWT'] : null;
 };
-
-/* 
-clientID: process.env.clientID,
-clientSecret: process.env.clientSecret,
-callbackURL: 'http://localhost:8080/githubcallback',
-*/
 
 const LocalStrategy = local.Strategy;
 const GithubStrategy = github.Strategy;
@@ -91,8 +85,8 @@ const initializePassport = () => {
     'github',
     new GithubStrategy(
       {
-        clientID: process.env.clientID,
-        clientSecret: process.env.clientSecret,
+        clientID: config.clientID,
+        clientSecret: config.clientSecret,
         callbackURL: 'http://localhost:8080/api/session/githubcallback',
       },
       async (asccesToken, refreshToken, profile, done) => {
@@ -128,7 +122,7 @@ const initializePassport = () => {
     new JWTStrategy(
       {
         jwtFromRequest: passportJWT.ExtractJwt.fromExtractors([extractCookie]),
-        secretOrKey: 'secret',
+        secretOrKey: config.privatekey,
       },
       async (jwt_payload, done) => {
         try {

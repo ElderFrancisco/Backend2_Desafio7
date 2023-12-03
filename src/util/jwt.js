@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
+const { config } = require('../config/config');
 
 const generateToken = (user) => {
   const filteredUser = {
@@ -10,7 +10,7 @@ const generateToken = (user) => {
     rol: user.rol,
     cartId: user.cartId,
   };
-  const token = jwt.sign({ user: filteredUser }, 'secret', {
+  const token = jwt.sign({ user: filteredUser }, config.privatekey, {
     expiresIn: '24h',
   });
   return token;
@@ -20,7 +20,7 @@ const accessPublicWithoutAuth = (req, res, next) => {
   const token = req.cookies['cookieJWT'];
   if (!token) return next();
 
-  jwt.verify(token, 'secret', (error, credentials) => {
+  jwt.verify(token, config.privatekey, (error, credentials) => {
     if (error) {
       res.clearCookie('cookieJWT');
       return next();
@@ -36,7 +36,7 @@ const authToHome = (req, res, next) => {
 
     return next();
   }
-  jwt.verify(token, 'secret', (error, credentials) => {
+  jwt.verify(token, config.privatekey, (error, credentials) => {
     if (error) {
       req.user = null;
       res.clearCookie('cookieJWT');

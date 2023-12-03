@@ -1,10 +1,8 @@
-const ProductManagerDb = require('../../dao/managersDb/ProductManagerDb');
+const ProductManagerDb = require('../dao/managersDb/ProductManagerDb');
 const { Router } = require('express');
 const bodyParser = require('body-parser');
 const passport = require('passport');
-
 const productController = new ProductManagerDb();
-
 module.exports = (app) => {
   let router = new Router();
   app.use(bodyParser.json());

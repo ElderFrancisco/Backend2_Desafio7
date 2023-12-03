@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const passport = require('passport');
-const { accessPublicWithoutAuth, authToHome } = require('../../util/jwt');
+const { accessPublicWithoutAuth, authToHome } = require('../util/jwt');
 
 module.exports = (app) => {
   let router = new Router();

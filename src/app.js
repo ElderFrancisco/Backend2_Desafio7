@@ -5,23 +5,21 @@ const bodyParser = require('body-parser');
 const exphbs = require('express-handlebars');
 const utilSocket = require('./util/socket');
 const mongoose = require('mongoose');
-require('dotenv').config();
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const passport = require('passport');
 const initializePassport = require('./config/passport.config');
 const cookieParser = require('cookie-parser');
+const { config, mongo } = require('./config/config');
 
 class Server {
   constructor() {
     this.app = express();
-    this.port = process.env.PORT || 3000;
-    this.mongoUrl = process.env.MONGO_URL;
-    this.mongoName = process.env.MONGO_NAME;
+    this.port = config.port || 3000;
     this.settings();
-    this.routes();
     this.server = http.createServer(this.app);
     this.connect();
+    this.routes();
   }
 
   settings() {
@@ -36,11 +34,11 @@ class Server {
     this.app.use(
       session({
         store: MongoStore.create({
-          mongoUrl: this.mongoUrl,
-          dbName: this.mongoName,
+          mongoUrl: mongo.mongo_url,
+          dbName: mongo.mongo_name,
           ttl: 1100, //tiempo de vida de la sesion
         }),
-        secret: 'secret',
+        secret: config.privatekey,
         resave: true,
         saveUninitialized: true,
       }),
@@ -53,12 +51,12 @@ class Server {
 
   connect() {
     mongoose
-      .connect(this.mongoUrl, { dbName: this.mongoName })
+      .connect(mongo.mongo_url, { dbName: mongo.mongo_name })
       .then(() => {
         console.log('db connected');
       })
       .catch((e) => {
-        console.log('error' + e);
+        console.log('error al conectar mongo: ' + e);
       });
   }
 

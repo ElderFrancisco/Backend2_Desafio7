@@ -1,4 +1,4 @@
-const ProductManagerDb = require('../../dao/managersDb/ProductManagerDb');
+const ProductManagerDb = require('../dao/managersDb/ProductManagerDb');
 const productController = new ProductManagerDb();
 const { Router } = require('express');
 
