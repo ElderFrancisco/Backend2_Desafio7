@@ -16,20 +16,26 @@ class ProductServices {
   }
   async createProduct(product) {
     try {
-      const Product = await productModel.create(product);
-      return Product;
+      return await productModel.create(product);
     } catch (error) {
       console.log('Error on ProductServices, createProduct function: ' + error);
     }
   }
-  async findProduct(key, valor) {
+  async findProduct(query) {
     try {
-      const query = {};
-      query[key] = valor;
-      const product = await productModel.findOne(query).lean();
-      return product;
+      return await productModel.findOne(query).lean();
     } catch (error) {
       console.log('Error on ProductServices, findProduct function: ' + error);
+    }
+  }
+
+  async findByIdAndUpdate(id, body) {
+    try {
+      return await productModel.findByIdAndUpdate(id, body).lean();
+    } catch (error) {
+      console.log(
+        'Error on ProductServices, findByIdAndUpdate function: ' + error,
+      );
     }
   }
 }
