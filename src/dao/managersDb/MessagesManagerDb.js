@@ -1,4 +1,4 @@
-const messageModel = require('../models/messages.models');
+const messageModel = require('../mongo/models/messages.models');
 
 class MessageManagerDb {
   constructor() {}

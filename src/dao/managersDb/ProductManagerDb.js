@@ -1,4 +1,4 @@
-const productModel = require('../models/products.model');
+const productModel = require('../mongo/models/products.model');
 const allowedFields = [
   'title',
   'description',

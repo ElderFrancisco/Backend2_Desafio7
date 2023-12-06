@@ -1,5 +1,5 @@
-const cartModel = require('../models/carts.model.js');
-const productModel = require('../models/products.model.js');
+const cartModel = require('../mongo/models/carts.model.js');
+const productModel = require('../mongo/models/products.model.js');
 
 class CartManagerDb {
   constructor() {}

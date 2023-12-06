@@ -1,4 +1,4 @@
-const ProductServices = require('./services/Product.Services');
+const ProductServices = require('../services/product.services');
 const allowedFields = [
   'title',
   'description',
@@ -49,44 +49,6 @@ function getQueryParams(req) {
   };
   return params;
 }
-function getParams(req) {
-  const p = req.params;
-  const PId = p.pid;
-  const parametros = {
-    PId,
-  };
-  return parametros;
-}
-function getUrl(params, path, number) {
-  const nextPage = parseInt(params.page) + number;
-
-  let url = `${path}?page=${nextPage >= 1 ? nextPage : 1}`;
-  if (params.limit !== 10) {
-    url += `&limit=${params.limit}`;
-  }
-  if (params.query != null) {
-    url += `&query=${JSON.stringify(params.query)}`;
-  }
-  if (params.sort != null) {
-    url += `&sort=${JSON.stringify(params.sort)}`;
-  }
-  return url;
-}
-function createResult(doc, state, urlPrev, urlNext) {
-  const result = {
-    status: state,
-    payload: doc.docs,
-    totalPages: doc.totalPages,
-    prevPage: doc.prevPage,
-    nextPage: doc.nextPage,
-    page: doc.page,
-    hasPrevPage: doc.hasPrevPage,
-    hasNextPage: doc.hasNextPage,
-    prevLink: doc.hasPrevPage == true ? urlPrev : null,
-    nextLink: doc.hasNextPage == true ? urlNext : null,
-  };
-  return result;
-}
 function getProductByBody(req) {
   const body = req.body;
   const title = body.title;
@@ -112,20 +74,19 @@ function getProductByBody(req) {
 
 const ProductServicesManager = new ProductServices();
 
-class ProductControllero {
+class ProductController {
   async getProducts(req, res) {
     try {
       const pathUrl = getPathUrl(req);
       const params = getQueryParams(req);
-      const productsList = await ProductServicesManager.getProducts(params);
-      const urlPrev = getUrl(params, pathUrl, -1);
-      const urlNext = getUrl(params, pathUrl, +1);
-      const result = createResult(productsList, 'success', urlPrev, urlNext);
-      return res.status(200).send(result);
+      const result = await ProductServicesManager.getProducts(params, pathUrl);
+      if (result.status == 'error') {
+        return res.status(500).json({ status: 'error' });
+      }
+      return res.status(200).json(result);
     } catch (error) {
       console.log(error);
-      const result = createResult(productsList, 'error', urlPrev, urlNext);
-      return res.status(500).send(result);
+      return res.status(500).json({ status: 'error' });
     }
   }
 
@@ -152,16 +113,14 @@ class ProductControllero {
       }
     } catch (error) {
       console.log(error);
-      return error;
+      return res.status(500).json({ status: 'error' });
     }
   }
 
   async getProductById(req, res) {
     try {
-      const params = getParams(req);
-      const query = {};
-      query['_id'] = params.PId;
-      const productId = await ProductServicesManager.findProduct(query);
+      const Id = req.params.pid;
+      const productId = await ProductServicesManager.findProductById(Id);
       if (productId == null) {
         return res
           .status(404)
@@ -169,17 +128,16 @@ class ProductControllero {
       }
       return res.status(200).json({ status: 'success', payload: productId });
     } catch (error) {
-      console.log('error en getproductById' + error);
+      console.log(error);
+      return res.status(500).json({ status: 'error' });
     }
   }
 
-  async updateById(req, res) {
+  async updateProductById(req, res) {
     try {
-      const params = getParams(req);
+      const Id = req.params.pid;
       const body = req.body;
-      const query = {};
-      query['_id'] = params.PId;
-      const productToUpdate = await ProductServicesManager.findProduct(query);
+      const productToUpdate = await ProductServicesManager.findProductById(Id);
       if (!productToUpdate) {
         return res
           .status(404)
@@ -194,17 +152,32 @@ class ProductControllero {
           updatedProduct[campo] = productToUpdate[campo];
         }
       });
-      await ProductServicesManager.findByIdAndUpdate(
-        params.PId,
+      const result = await ProductServicesManager.findByIdAndUpdate(
+        Id,
         updatedProduct,
       );
-      const result = await ProductServicesManager.findProduct(query);
       return res.status(201).json({ status: 'success', payload: result });
     } catch (error) {
       console.log(error);
-      return null;
+    }
+  }
+
+  async deleteProductById(req, res) {
+    try {
+      const Id = req.params.pid;
+      const productDelete = await ProductServicesManager.findByIdAndDelete(Id);
+      if (productDelete.deletedCount === 1) {
+        return res
+          .status(204)
+          .json({ status: 'Success', message: 'Product deleted successfully' });
+      }
+      return res
+        .status(404)
+        .json({ status: 'Error', error: 'Product not found' });
+    } catch (error) {
+      console.log(error);
     }
   }
 }
 
-module.exports = ProductControllero;
+module.exports = ProductController;

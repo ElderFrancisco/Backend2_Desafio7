@@ -1,13 +1,10 @@
-const ProductManagerDb = require('../dao/managersDb/ProductManagerDb');
+const ProductController = require('../controllers/Product.controller');
 const { Router } = require('express');
-const bodyParser = require('body-parser');
 const passport = require('passport');
-const productController = new ProductManagerDb();
+const productController = new ProductController();
+
 module.exports = (app) => {
   let router = new Router();
-  app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: true }));
-
   app.use('/products', router);
 
   router.get(
@@ -16,15 +13,12 @@ module.exports = (app) => {
     async (req, res) => {
       try {
         const { user } = req.user;
-        const currentPath = req.originalUrl;
-        const params = req.query;
-        const productsList = await productController.getProducts(
-          params,
-          currentPath,
-        );
+        const productList = await productController.getProducts(req, res);
+        // El problema esta en que devuelve res.status.json, en vez de los
+        //productos
         res
           .status(200)
-          .render('products', { products: productsList, user: user });
+          .render('products', { products: productList, user: user });
       } catch (error) {
         console.log(error);
         res.status(500).send(error);

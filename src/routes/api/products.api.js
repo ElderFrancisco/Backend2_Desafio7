@@ -1,10 +1,8 @@
-const ProductManagerDb = require('../../dao/managersDb/ProductManagerDb');
 const { Router } = require('express');
 const passport = require('passport');
-const ProductControllero = require('../../controllers/Product.controller');
+const ProductController = require('../../controllers/Product.controller');
 
-const productController = new ProductManagerDb();
-const productController1 = new ProductControllero();
+const productController = new ProductController();
 
 module.exports = (app) => {
   let router = new Router();
@@ -13,43 +11,30 @@ module.exports = (app) => {
   router.get(
     '/',
     passport.authenticate('jwt', { session: false }),
-    async (req, res) => {
-      return productController1.getProducts(req, res);
-    },
+    productController.getProducts,
   );
 
   router.post(
     '/',
     passport.authenticate('jwt', { session: false }),
-    async (req, res) => {
-      return productController1.addProduct(req, res);
-    },
+    productController.addProduct,
   );
 
   router.get(
     '/:pid',
     passport.authenticate('jwt', { session: false }),
-    async (req, res) => {
-      return productController1.getProductById(req, res);
-    },
+    productController.getProductById,
   );
 
   router.put(
     '/:pid',
     passport.authenticate('jwt', { session: false }),
-    async (req, res) => {
-      return productController1.updateById(req, res);
-    },
+    productController.updateProductById,
   );
 
-  router.delete('/:pid', async (req, res) => {
-    try {
-      const paramsID = req.params.pid;
-      const productDeleted = await productController.deleteProduct(paramsID);
-      return res.status(200).json(productDeleted);
-    } catch (error) {
-      console.log(error);
-      res.status(500).send(error);
-    }
-  });
+  router.delete(
+    '/:pid',
+    passport.authenticate('jwt', { session: false }),
+    productController.deleteProductById,
+  );
 };
