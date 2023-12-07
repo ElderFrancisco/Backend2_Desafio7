@@ -1,13 +1,10 @@
 const CartManagerDb = require('../dao/managersDb/CartManagerDb');
 const { Router } = require('express');
-const bodyParser = require('body-parser');
 
 const cartController = new CartManagerDb();
 
 module.exports = (app) => {
   let router = new Router();
-  app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: true }));
 
   app.use('/cart', router);
 

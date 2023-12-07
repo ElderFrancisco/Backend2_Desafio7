@@ -1,26 +1,16 @@
 const CartManagerDb = require('../../dao/managersDb/CartManagerDb');
 const { Router } = require('express');
-const bodyParser = require('body-parser');
+const CartController = require('../../controllers/Cart.controller');
 
-const cartController = new CartManagerDb();
+const cartController = new CartController();
 
 module.exports = (app) => {
   let router = new Router();
-  app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: true }));
 
   app.use('/api/cart', router);
 
-  router.post('/', async (req, res) => {
-    try {
-      const body = req.body;
-      const cart = await cartController.createNewCart(body);
-      res.status(200).send(cart);
-    } catch (error) {
-      res.status(500).send(error);
-    }
-  });
-
+  router.post('/', cartController.createNewCart);
+  /*
   router.get('/:cid', async (req, res) => {
     try {
       const params = req.params;
@@ -100,4 +90,5 @@ module.exports = (app) => {
       res.status(500).send(error);
     }
   });
+  */
 };

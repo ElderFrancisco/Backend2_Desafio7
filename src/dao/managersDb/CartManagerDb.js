@@ -7,9 +7,12 @@ class CartManagerDb {
   async createNewCart(body) {
     try {
       const products = Array.isArray(body.products) ? body.products : [];
+      const filterProducts = products.filter((e) => e.product && e.quantity);
+      console.log(filterProducts);
       const cart = {
         products,
       };
+      return cart;
       const createdCart = await cartModel.create(cart);
       return createdCart;
     } catch (error) {
@@ -155,10 +158,6 @@ class CartManagerDb {
 
   async emptyCart(params) {
     try {
-      //
-      // ACA HAY UN PROBLEMA, SI SE ENVIA CUALQUIER PRODUCT Y EL ID NO ESTA DENTRO DE LA COLLECION
-      // DE PRODUCTS SEN ENVIA EL PRODUCTO IGUAL PERO SIN EL NOMBRE. LA IDEA SERIA NO ENVIARLO DIRECTAMENTE
-      //
       const cid = params.cid;
       const cartToEmpty = await cartModel.findById(cid);
 

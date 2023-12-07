@@ -9,21 +9,21 @@ class ProductsDao {
         lean: true,
       });
     } catch (error) {
-      console.log('error on dao getAll');
+      console.log('error on ProductsDao getAll');
     }
   }
   async createOne(product) {
     try {
       return await productModel.create(product);
     } catch (error) {
-      console.log('error on dao createOne');
+      console.log('error on ProductsDao createOne');
     }
   }
   async get(query) {
     try {
       return await productModel.findOne(query).lean();
     } catch (error) {
-      console.log('error on dao getById');
+      console.log('error on ProductsDao getById');
     }
   }
 
@@ -33,14 +33,14 @@ class ProductsDao {
         .findOneAndUpdate(query, update, { new: true })
         .lean();
     } catch (error) {
-      console.log('error on dao updateOne');
+      console.log('error on ProductsDao updateOne');
     }
   }
   async deleteOne(query) {
     try {
       return await productModel.deleteOne(query);
     } catch (error) {
-      console.log('error on dao updateOne');
+      console.log('error on ProductsDao updateOne');
     }
   }
 }

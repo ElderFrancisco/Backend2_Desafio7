@@ -1,89 +1,21 @@
-const ProductServices = require('../services/product.services');
-const allowedFields = [
-  'title',
-  'description',
-  'price',
-  'thumbnail',
-  'code',
-  'stock',
-  'category',
-  'status',
-];
+const CartServices = require('../services/cart.services');
 
-function getPathUrl(req) {
-  const currentPath = req.originalUrl;
-  const index = currentPath.indexOf('?');
-  if (index !== -1) {
-    const a = currentPath.substring(0, index);
-    return a;
-  } else {
-    return currentPath;
-  }
-}
-function getQueryParams(req) {
-  const p = req.query;
-  const limit = parseInt(p.limit) || 10;
-  const page = p.page || 1;
-  const pquery = p.query;
-  const psort = p.sort;
-  const query = (() => {
+const CartServicesManager = new CartServices();
+
+class CartController {
+  async createNewCart(req, res) {
     try {
-      return JSON.parse(pquery);
-    } catch (error) {
-      return null;
-    }
-  })();
+      const productsBody = Array.isArray(req.body.products)
+        ? req.body.products
+        : [];
+      const products = productsBody.filter((e) => e.product && e.quantity);
+      const cart = {
+        products,
+      };
 
-  const sort = (() => {
-    try {
-      return JSON.parse(psort);
-    } catch (error) {
-      return null;
-    }
-  })();
-  const params = {
-    limit,
-    page,
-    query,
-    sort,
-  };
-  return params;
-}
-function getProductByBody(req) {
-  const body = req.body;
-  const title = body.title;
-  const description = body.description;
-  const price = body.price;
-  const thumbnail = Array.isArray(body.thumbnail) ? body.thumbnail : [];
-  const code = body.code;
-  const stock = body.stock;
-  const category = body.category;
-  const status = body.status === false ? false : true;
-  const productBody = {
-    title,
-    description,
-    price,
-    thumbnail,
-    code,
-    stock,
-    category,
-    status,
-  };
-  return productBody;
-}
-
-const ProductServicesManager = new ProductServices();
-
-class ProductController {
-  async getProducts(req, res) {
-    try {
-      const pathUrl = getPathUrl(req);
-      const params = getQueryParams(req);
-      const result = await ProductServicesManager.getProducts(params, pathUrl);
-      if (result.status == 'error') {
-        return res.status(500).json({ status: 'error' });
-      }
-      return res.status(200).json(result);
+      const result = await CartServicesManager.createNewCart(cart);
+      if (!result) return res.status(400).json({ status: 'error' });
+      return res.status(201).json(result);
     } catch (error) {
       console.log(error);
       return res.status(500).json({ status: 'error' });
@@ -216,4 +148,4 @@ class ProductController {
   }
 }
 
-module.exports = ProductController;
+module.exports = CartController;

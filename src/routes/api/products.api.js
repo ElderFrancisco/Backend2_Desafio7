@@ -28,7 +28,7 @@ module.exports = (app) => {
 
   router.put(
     '/:pid',
-    passport.authenticate('jwt', { session: false }),
+    //passport.authenticate('jwt', { session: false }),
     productController.updateProductById,
   );
 
