@@ -80,9 +80,6 @@ class ProductController {
       const pathUrl = getPathUrl(req);
       const params = getQueryParams(req);
       const result = await ProductServicesManager.getProducts(params, pathUrl);
-      if (result.status == 'error') {
-        return res.status(500).json({ status: 'error' });
-      }
       return res.status(200).json(result);
     } catch (error) {
       console.log(error);

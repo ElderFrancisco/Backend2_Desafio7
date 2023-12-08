@@ -23,7 +23,7 @@ class ProductsDao {
     try {
       return await productModel.findOne(query).lean();
     } catch (error) {
-      console.log('error on ProductsDao getById');
+      console.log('error on ProductsDao get');
     }
   }
 
@@ -40,7 +40,7 @@ class ProductsDao {
     try {
       return await productModel.deleteOne(query);
     } catch (error) {
-      console.log('error on ProductsDao updateOne');
+      console.log('error on ProductsDao deleteOne');
     }
   }
 }

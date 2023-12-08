@@ -7,31 +7,14 @@ const cartController = new CartController();
 module.exports = (app) => {
   let router = new Router();
 
-  app.use('/api/cart', router);
+  app.use('/api/carts', router);
 
   router.post('/', cartController.createNewCart);
+
+  router.get('/:cid', cartController.getCartById);
+
+  router.get('/', cartController.getCarts);
   /*
-  router.get('/:cid', async (req, res) => {
-    try {
-      const params = req.params;
-      const cartId = await cartController.getCartById(params);
-      res.status(200).send(cartId);
-    } catch (error) {
-      res.status(500).send(error);
-    }
-  });
-
-  router.get('/', async (req, res) => {
-    try {
-      const limit = parseInt(req.query.limit);
-      const Carts = await cartController.getCarts(limit);
-      res.status(200).send(Carts);
-    } catch (error) {
-      console.log(error);
-      res.status(500).send(error);
-    }
-  });
-
   router.post('/:cid/product/:pid', async (req, res) => {
     try {
       const cid = req.params.cid;
