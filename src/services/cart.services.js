@@ -1,3 +1,4 @@
+const { query } = require('express');
 const CartsDao = require('../dao/mongo/cartsDao');
 
 const CartsDaoManager = new CartsDao();
@@ -42,8 +43,7 @@ class CartServices {
   }
   async getCartById(cid) {
     try {
-      const query = {};
-      query['_id'] = cid;
+      const query = { _id: cid };
       return await CartsDaoManager.getOne(query);
     } catch (error) {
       console.log('Error on CartServices, createNewCart function: ' + error);
@@ -56,6 +56,27 @@ class CartServices {
       const urlNext = getUrl(params, pathUrl, +1);
       const cartList = await CartsDaoManager.getAll(params);
       const result = createResult(cartList, 'success', urlPrev, urlNext);
+      return result;
+    } catch (error) {
+      console.log('Error on ProductServices, getProducts function: ' + error);
+      return error;
+    }
+  }
+
+  async updateOneCart(cid, pid) {
+    try {
+      const query = { _id: cid };
+      const cartToUpdate = await CartsDaoManager.getOne(query);
+      const indexProduct = cartToUpdate.products.findIndex((product) => {
+        return product.product._id == pid;
+      });
+      if (indexProduct >= 0) {
+        cartToUpdate.products[indexProduct].quantity++;
+      } else {
+        cartToUpdate.products.push({ product: pid, quantity: 1 });
+      }
+
+      const result = CartsDaoManager.updateOne(query, cartToUpdate);
       return result;
     } catch (error) {
       console.log('Error on ProductServices, getProducts function: ' + error);

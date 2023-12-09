@@ -24,10 +24,8 @@ class CartManagerDb {
     try {
       const cid = params.cid;
 
-      const existCart = await cartModel
-        .findById(cid)
-        .populate('products.product')
-        .lean();
+      const existCart = await cartModel.findById(cid);
+      //.populate('products.product').lean();
 
       if (existCart) {
         return existCart;
@@ -71,7 +69,6 @@ class CartManagerDb {
       const indexProduct = cartToUpdate.products.findIndex((product) => {
         return product.product == pid;
       });
-      console.log(indexProduct);
       if (indexProduct >= 0) {
         cartToUpdate.products[indexProduct].quantity++;
       } else {

@@ -28,5 +28,13 @@ class CartsDao {
       console.log('error on CartsDao getAll' + error);
     }
   }
+
+  async updateOne(query, update) {
+    try {
+      return await cartModel.findOneAndUpdate(query, update, { new: true });
+    } catch (error) {
+      console.log('error on CartsDao getOne' + error);
+    }
+  }
 }
 module.exports = CartsDao;

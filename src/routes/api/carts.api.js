@@ -14,19 +14,9 @@ module.exports = (app) => {
   router.get('/:cid', cartController.getCartById);
 
   router.get('/', cartController.getCarts);
-  /*
-  router.post('/:cid/product/:pid', async (req, res) => {
-    try {
-      const cid = req.params.cid;
-      const pid = req.params.pid;
-      const updatedCart = await cartController.updateCart(cid, pid);
-      res.send(updatedCart);
-    } catch {
-      console.log(error);
-      res.status(500).send(error);
-    }
-  });
 
+  router.post('/:cid/product/:pid', cartController.updateOneCartByIdProduct);
+  /*
   router.delete('/:cid/product/:pid', async (req, res) => {
     try {
       const cid = req.params.cid;

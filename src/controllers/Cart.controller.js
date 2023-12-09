@@ -66,6 +66,20 @@ class CartController {
       return res.status(500).json({ status: 'error' });
     }
   }
+  async updateOneCartByIdProduct(req, res) {
+    try {
+      const cid = req.params.cid;
+      const pid = req.params.pid;
+      const result = await CartServicesManager.updateOneCart(cid, pid);
+      if (!result) {
+        return res.status(404).json({ Status: 'Error' });
+      }
+      return res.status(201).json({ status: 'Success', payload: result });
+    } catch (error) {
+      onsole.log(error);
+      return res.status(500).json({ status: 'error' });
+    }
+  }
 }
 
 module.exports = CartController;
