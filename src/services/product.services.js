@@ -61,8 +61,7 @@ class ProductServices {
 
   async findProductById(id) {
     try {
-      const query = {};
-      query['_id'] = id;
+      const query = { _id: id };
       return await ProductsDaoManager.get(query);
     } catch (error) {
       console.log('Error on ProductServices, findProduct function: ' + error);

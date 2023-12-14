@@ -1,15 +1,18 @@
 const passport = require('passport');
 const local = require('passport-local');
 const github = require('passport-github2');
-const userModel = require('../dao/mongo/models/users.model');
 const HashManager = require('../util/hash');
 
 const passportJWT = require('passport-jwt');
 const { generateToken } = require('../util/jwt');
 //const CartManagerDb = require('../dao/managersDb/CartManagerDb');
-const { config, mongo } = require('./config');
+const { config } = require('./config');
+
 const CartServices = require('../services/cart.services');
 const CartController = new CartServices();
+
+const UsersServices = require('../services/user.services');
+const usersServices = new UsersServices();
 
 const JWTStrategy = passportJWT.Strategy;
 
@@ -32,7 +35,7 @@ const initializePassport = () => {
       async (req, username, password, done) => {
         const { first_name, last_name, email, age } = req.body;
         try {
-          const user = await userModel.findOne({ email: username });
+          const user = await usersServices.findOneByEmail(username);
           if (user) {
             console.log('user already existst');
             return done(null, false);
@@ -46,7 +49,7 @@ const initializePassport = () => {
             password: HashController.createHash(password),
             cartId: cartId._id,
           };
-          const result = await userModel.create(newUser);
+          const result = await usersServices.createNewUser(newUser);
           return done(null, result);
         } catch (error) {
           console.log(error);
@@ -64,7 +67,7 @@ const initializePassport = () => {
 
       async (username, password, done) => {
         try {
-          const user = await userModel.findOne({ email: username });
+          const user = await usersServices.findOneByEmail({ email: username });
           if (!user) {
             console.log('user doesnt exist');
             return done(null, false);
@@ -93,7 +96,7 @@ const initializePassport = () => {
       async (asccesToken, refreshToken, profile, done) => {
         try {
           if (profile._json.email == null) return done(null, false);
-          const user = await userModel.findOne({ email: profile._json.email });
+          const user = await usersServices.findOneByEmail(profile._json.email);
           if (user) {
             const token = generateToken(user);
             user.token = token;
@@ -108,7 +111,7 @@ const initializePassport = () => {
             password: HashController.createHash(''),
             cartId: cartId._id,
           };
-          const result = await userModel.create(newUser);
+          const result = await usersServices.createNewUser(newUser);
 
           return done(null, result);
         } catch (error) {
@@ -141,7 +144,7 @@ const initializePassport = () => {
   });
 
   passport.deserializeUser(async (id, done) => {
-    const user = await userModel.findById(id);
+    const user = await usersServices.findUserById(id);
     done(null, user);
   });
 };
