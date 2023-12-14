@@ -3,7 +3,7 @@ const http = require('http');
 const routes = require('./routes');
 const bodyParser = require('body-parser');
 const exphbs = require('express-handlebars');
-const utilSocket = require('./util/socket');
+//const utilSocket = require('./util/socket');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
@@ -45,7 +45,7 @@ class Server {
     );
     this.app.use(passport.initialize());
     this.app.use(passport.session());
-    utilSocket(this.server);
+    //utilSocket(this.server);
     this.app.use(cookieParser());
   }
 

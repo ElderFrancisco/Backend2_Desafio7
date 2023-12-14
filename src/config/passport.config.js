@@ -6,9 +6,10 @@ const HashManager = require('../util/hash');
 
 const passportJWT = require('passport-jwt');
 const { generateToken } = require('../util/jwt');
-const CartManagerDb = require('../dao/managersDb/CartManagerDb');
+//const CartManagerDb = require('../dao/managersDb/CartManagerDb');
 const { config, mongo } = require('./config');
-const CartController = new CartManagerDb();
+const CartServices = require('../services/cart.services');
+const CartController = new CartServices();
 
 const JWTStrategy = passportJWT.Strategy;
 
@@ -36,7 +37,7 @@ const initializePassport = () => {
             console.log('user already existst');
             return done(null, false);
           }
-          const cartId = await CartController.createNewCart(req.body);
+          const cartId = await CartController.createNewCart(req.body.products);
           const newUser = {
             first_name,
             last_name,

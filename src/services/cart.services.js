@@ -67,6 +67,7 @@ class CartServices {
     try {
       const query = { _id: cid };
       const cartToUpdate = await CartsDaoManager.getOne(query);
+      if (!cartToUpdate) return null;
       const indexProduct = cartToUpdate.products.findIndex((product) => {
         return product.product._id == pid;
       });
@@ -75,6 +76,75 @@ class CartServices {
       } else {
         cartToUpdate.products.push({ product: pid, quantity: 1 });
       }
+
+      const result = CartsDaoManager.updateOne(query, cartToUpdate);
+      return result;
+    } catch (error) {
+      console.log('Error on ProductServices, getProducts function: ' + error);
+      return error;
+    }
+  }
+
+  async deleteProductCart(cid, pid) {
+    try {
+      const query = { _id: cid };
+      const cartToUpdate = await CartsDaoManager.getOne(query);
+      if (!cartToUpdate) return null;
+      const indexProduct = cartToUpdate.products.findIndex((product) => {
+        return product.product._id == pid;
+      });
+
+      if (indexProduct >= 0) {
+        if (cartToUpdate.products[indexProduct].quantity == 1) {
+          cartToUpdate.products.splice(indexProduct, 1);
+        } else cartToUpdate.products[indexProduct].quantity--;
+      } else {
+        return null;
+      }
+      const result = CartsDaoManager.updateOne(query, cartToUpdate);
+      return result;
+    } catch (error) {
+      console.log('Error on ProductServices, getProducts function: ' + error);
+      return error;
+    }
+  }
+
+  async updateManyProducts(cid, products) {
+    try {
+      const query = { _id: cid };
+      const cartToUpdate = await CartsDaoManager.getOne(query);
+      if (!cartToUpdate) return null;
+      products.forEach((productFull) => {
+        const indexProduct = cartToUpdate.products.findIndex((product) => {
+          return product.product._id == productFull.product;
+        });
+        if (indexProduct >= 0) {
+          cartToUpdate.products[indexProduct].quantity += productFull.quantity;
+        } else {
+          let quantityOfProduct = 1;
+          if (productFull.quantity !== null || productFull.quantity !== 0) {
+            quantityOfProduct = productFull.quantity;
+          }
+          cartToUpdate.products.push({
+            product: productFull.product,
+            quantity: quantityOfProduct,
+          });
+        }
+      });
+      const result = CartsDaoManager.updateOne(query, cartToUpdate);
+      return result;
+    } catch (error) {
+      console.log('Error on ProductServices, getProducts function: ' + error);
+      return error;
+    }
+  }
+
+  async emptyCartById(cid) {
+    try {
+      const query = { _id: cid };
+      const cartToUpdate = await CartsDaoManager.getOne(query);
+      if (!cartToUpdate) return null;
+      cartToUpdate.products = [];
 
       const result = CartsDaoManager.updateOne(query, cartToUpdate);
       return result;

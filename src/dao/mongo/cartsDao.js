@@ -34,6 +34,7 @@ class CartsDao {
       return await cartModel.findOneAndUpdate(query, update, { new: true });
     } catch (error) {
       console.log('error on CartsDao getOne' + error);
+      return;
     }
   }
 }
